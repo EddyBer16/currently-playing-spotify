@@ -1,6 +1,6 @@
 let client_id = '9ccebc57069a49eeaa3d29d18b8efd92'
 let client_secret = '04395979bc074dbb8f603e347b56ce2e'
-let redirect_uri = 'http://localhost:5000'
+let redirect_uri = 'https://eddyber16.github.io/currently-playing-spotify/'
 
 async function getCurrentSong(access_token) {
     let myHeaders = new Headers()
