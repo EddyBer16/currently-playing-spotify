@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Now Playing - No music</title>
+
+	<style>
+		@font-face {
+  		font-family: 'Fredoka One';
+  		font-style: normal;
+  		font-weight: 400;
+  		font-display: swap;
+  		src: url(https://fonts.gstatic.com/s/fredokaone/v8/k3kUo8kEI-tA1RRcTZGmTlHGCac.woff2) format('woff2');
+  		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+		}
+	</style>
+
+	<style>
+		:root {
+			--text-width: 0px;
+			--progress-bar-width: 0%;
+			--progress-bar-width-px: 0px;
+		}
+
+		* {
+			padding: 0;
+			margin: 0;
+		}
+		body {
+			font-family: 'Fredoka One', arial, sans-serif;
+			text-transform: lowercase;
+			color: #6F7A9A;
+		}
+		
+		#container {
+			display: flex;
+			width: 400px;
+			height: 70px;
+			overflow: hidden;
+		}
+
+		#container > h1 {
+			display: block;
+			padding: 10px;
+			position: relative;
+			text-align: center;
+			top: 0;
+			left: 100%;
+			flex-shrink: 0;
+			animation: slide linear 10s infinite;
+		}
+
+		@keyframes slide {
+			0% {
+				left: 100%;
+			} 100% {
+				left: var(--text-width);
+			}
+		}
+
+		.progress-bar_container {
+			width: 400px;
+			height: 9px;
+			background: #2B324A;
+		}
+
+		.progress-bar_progress {
+			transition: width 1s;
+			width: var(--progress-bar-width);
+			height: 9px;
+			background: #6F7A9A;
+		}
+
+		.progress-bar_progress::after {
+			content: '';
+			transition: left 1s;
+			display: inline-block;
+			position: relative;
+			top: -3px;
+			left: var(--progress-bar-width-px);
+			width: 16px;
+			height: 16px;
+			border-radius: 100%;
+			background: #6F7A9A;
+		}
+
+		.controls {
+			margin-top: 30px;
+			padding: 0 100px;
+			width: calc(400px - 200px);
+			height: 40px;
+			display: flex;
+			justify-content: space-evenly;
+		}
+
+		.controls img {
+			height: 30px;
+			width: auto;
+		}
+
+		.controls > .forward {
+			transform: rotateZ(180deg);
+		}
+	</style>
+
+	<script src="script.js"></script>
+
+</head>
+<body onload="onPageLoad()">
+	<div id="container">
+		<h1>No artist - No song</h1>
+	</div>
+
+	<div class="progress-bar_container">
+		<div class="progress-bar_progress"></div>
+	</div>
+
+	<div class="controls">
+		<img src="./forward.svg" width="20" height="20" alt="">
+		<img src="./pause.svg" width="20" height="20" alt="">
+		<img class="forward" src="./forward.svg" width="20" height="20" alt="">
+	</div>
+
+	<script>
+		setInterval(function() {
+			(async function() {
+				let currentSong = await getCurrentSong(localStorage.getItem('access_token'))
+				let $currentlyPlaying = document.querySelector('#container > h1')
+				let $progressBarProgress = document.querySelector('.progress-bar_container > .progress-bar_progress')
+				let $head = document.querySelector('head')
+
+				// Format song details
+				let song = currentSong.artist + ' - ' + currentSong.name
+
+				// Set song details on page
+				$currentlyPlaying.innerHTML = song
+				document.title = song
+
+				// Set CSS variable with the width of the progress bar
+				document.querySelector(':root').style.setProperty('--progress-bar-width',
+							((currentSong.progress_ms / currentSong.duration_ms) * 100) + '%')
+				// Convert progress bar width from percentage to pixels for the indicator
+				document.querySelector(':root').style.setProperty('--progress-bar-width-px',
+							$progressBarProgress.parentNode.offsetWidth *
+							(currentSong.progress_ms / currentSong.duration_ms) - 6 + 'px')
+
+				// Set CSS variable to hide the whole song details
+				document.querySelector(':root').style.setProperty('--text-width', (0 - $currentlyPlaying.offsetWidth) + 'px')
+			})()	
+		}, 2000)
+	</script>
+</body>
+</html>
